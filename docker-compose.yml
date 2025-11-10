@@ -1,29 +1,26 @@
-version: '3'
+version: "3.8"
 
 services:
-
-  jobify-app:
-    image: node:18
-    container_name: jobify-jenkins-container
-    working_dir: /app
-    volumes:
-      - ./Server:/app/Server                 # Backend code
-      - ./Client/Jobify/dist:/app/Client/Jobify/dist  # Frontend build
-    command: sh -c "cd Server && node server.js"
-    ports:
-      - "8082:5000"   # host:container mapping
-    environment:
-      - PORT=5000
-      - MONGO_URI=mongodb://mongo:27017/jobify
-    depends_on:
-      - mongo
-
   mongo:
     image: mongo:6
-    container_name: mongo-for-jenkins
+    container_name: jobify-mongo-2
     restart: always
+    ports:
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongo_data:/data/db
+
+  web:
+    image: zeenia1997/jobify-full:v1
+    container_name: jobify-app-2
+    restart: always
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/jobify
+      PORT: 5000
+    ports:
+      - "8082:5000"
 
 volumes:
-  mongo-data:
+  mongo_data:
