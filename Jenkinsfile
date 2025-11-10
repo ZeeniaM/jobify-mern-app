@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "zeenia1997/jobify-full:latest"
+        DOCKER_IMAGE = "zeenia1997/jobify-full:latest"  // use your actual image tag
     }
 
     stages {
@@ -15,18 +15,26 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKER_IMAGE ./server-deploy'
+                    // Build from repo root
+                    sh 'docker build -t $DOCKER_IMAGE .'
                 }
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                dir('server-deploy') {
+                // Run docker-compose from repo root
+                dir('.') {
                     sh 'docker compose down'
                     sh 'docker compose up -d'
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished."
         }
     }
 }
